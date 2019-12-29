@@ -190,6 +190,7 @@
     position: absolute;
     top: 44px;
     bottom: 60px;
+    overflow: hidden;
   }
 
   .back-top {

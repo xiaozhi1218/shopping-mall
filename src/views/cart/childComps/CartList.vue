@@ -1,5 +1,5 @@
 <template>
-  <scroll>
+  <scroll class="content">
     <div>
       <cart-list-item v-for="item in cartList" :key="item.iid" :item-info="item"></cart-list-item>
     </div>
@@ -27,5 +27,7 @@
 </script>
 
 <style scoped>
-
+  .content {
+    overflow: hidden;
+  }
 </style>
