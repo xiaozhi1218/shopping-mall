@@ -20,6 +20,7 @@
     <back-top @backTop="backTop" class="back-top" v-show="showBackTop">
       <img src="~assets/img/common/top.png" alt="">
     </back-top>
+    <toast :message="message" :show="show"/>
   </div>
 </template>
 
@@ -37,10 +38,13 @@
 
   import DetailBottomBar from './childComps/DetailBottomBar'
   import BackTop from 'content/backTop/BackTop'
+  import Toast from "../../components/common/toast/Toast"
 
   import {getDetail, getRecommend, Goods, Shop, GoodsParam} from "network/detail";
   import {backTopMixin} from "@/common/mixin";
   import {BACKTOP_DISTANCE} from "@/common/const";
+
+  import {mapActions} from 'vuex'
 
   export default {
 		name: "Detail",
@@ -55,7 +59,8 @@
 		  Scroll,
 		  DetailNavBar,
       DetailSwiper,
-      BackTop
+      BackTop,
+      Toast
     },
     mixins: [backTopMixin],
     data() {
@@ -69,7 +74,9 @@
         commentInfo: {},
         recommendList: [],
         themeTops: [],
-        currentIndex: 0
+        currentIndex: 0,
+        message: '',
+        show: false
       }
     },
     created() {
@@ -81,8 +88,9 @@
       this._getOffsetTops()
     },
     methods: {
-		  _getOffsetTops() {
-		    this.themeTops = []
+      ...mapActions(['addCart']),
+      _getOffsetTops() {
+        this.themeTops = []
         this.themeTops.push(this.$refs.base.$el.offsetTop)
         this.themeTops.push(this.$refs.param.$el.offsetTop)
         this.themeTops.push(this.$refs.comment.$el.offsetTop)
@@ -90,7 +98,7 @@
         this.themeTops.push(Number.MAX_VALUE)
       },
       contentScroll(position) {
-		    // 1.监听backTop的显示
+        // 1.监听backTop的显示
         this.showBackTop = position.y < -BACKTOP_DISTANCE
 
         // 2.监听滚动到哪一个主题
@@ -113,7 +121,7 @@
            * 疑惑: 在第一个判断中, 为什么不能直接判断(currentPos >= iPos)即可?
            * 解答: 比如在某一个currentPos大于第0个时, 就会break, 不会判断后面的i了.
            */
-          if (position >= iPos && position < this.themeTops[i+1]) {
+          if (position >= iPos && position < this.themeTops[i + 1]) {
             if (this.currentIndex !== i) {
               this.currentIndex = i;
             }
@@ -135,10 +143,20 @@
         obj.desc = this.goods.desc;
         obj.newPrice = this.goods.nowPrice;
         // 3.添加到Store中
-        this.$store.commit('addCart', obj)
+        // this.$store.commit('addCart', obj)
+        this.addCart(obj).then(res => {
+          this.show = true
+          this.message = res
+          // console.log(res)
+          setTimeout(() => {
+            this.show = false
+            this.message = ''
+          },1500)
+
+        })
       },
-		  _getDetailData() {
-		    // 1.获取iid
+      _getDetailData() {
+        // 1.获取iid
         const iid = this.$route.query.iid
         this.iid = iid
 
