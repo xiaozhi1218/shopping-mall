@@ -1,4 +1,4 @@
-# xmgmail
+# shopping-mall
 
 ## Project setup
 ```
