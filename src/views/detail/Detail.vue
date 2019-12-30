@@ -43,6 +43,8 @@
   import {getDetail, getRecommend, Goods, Shop, GoodsParam} from "network/detail";
   import {backTopMixin} from "@/common/mixin";
   import {BACKTOP_DISTANCE} from "@/common/const";
+  import {debounce} from "../../common/utils"
+  import {itemListenerMixin} from "../../common/mixin"
 
   import {mapActions} from 'vuex'
 
@@ -62,7 +64,7 @@
       BackTop,
       Toast
     },
-    mixins: [backTopMixin],
+    mixins: [backTopMixin, itemListenerMixin],
     data() {
 		  return {
 		    iid: '',
@@ -86,6 +88,9 @@
     updated() {
 		  // 获取需要的四个offsetTop
       this._getOffsetTops()
+    },
+    destroyed() {
+      this.$bus.$off('itemImageLoad', this.itemImgListener)
     },
     methods: {
       ...mapActions(['addCart']),
@@ -145,13 +150,15 @@
         // 3.添加到Store中
         // this.$store.commit('addCart', obj)
         this.addCart(obj).then(res => {
-          this.show = true
-          this.message = res
-          // console.log(res)
-          setTimeout(() => {
-            this.show = false
-            this.message = ''
-          },1500)
+          // this.show = true
+          // this.message = res
+          // // console.log(res)
+          // setTimeout(() => {
+          //   this.show = false
+          //   this.message = ''
+          // },1500)
+
+          this.$toast.show(res, 2000)
 
         })
       },

@@ -2,7 +2,8 @@
   <div id="home">
     <nav-bar class="nav-bar"><div slot="center">购物街</div></nav-bar>
     <tab-control v-show="isTabFixed" class="fixed" @itemClick="tabClick"
-                 :titles="['流行', '新款', '精选']"></tab-control>
+                 :titles="['流行', '新款', '精选']"
+                 ref="tabControl1"></tab-control>
     <scroll class="content"
             ref="scroll"
             @scroll="contentScroll"
@@ -17,7 +18,7 @@
         <recommend-view></recommend-view>
         <tab-control @itemClick="tabClick"
                      :titles="['流行', '新款', '精选']"
-                     ref="tabControl"></tab-control>
+                     ref="tabControl2"></tab-control>
         <goods-list :goods-list="showGoodsList"></goods-list>
       </div>
     </scroll>
@@ -38,6 +39,8 @@
   import GoodsList from './childComps/GoodsList'
   import {getHomeMultidata, getHomeData, RECOMMEND, BANNER} from "network/home";
   import {NEW, POP, SELL, BACKTOP_DISTANCE} from "@/common/const";
+  import {debounce} from "../../common/utils"
+  import {itemListenerMixin} from "../../common/mixin"
 
   export default {
 		name: "Home",
@@ -51,6 +54,7 @@
       RecommendView,
       GoodsList,
     },
+    mixins: [itemListenerMixin],
     data() {
 		  return {
 		    banners: [],
@@ -86,6 +90,8 @@
     },
     deactivated: function () {
       this.$refs.hSwiper.stopTimer()
+
+      this.$bus.$off('itemImageLoad', this.itemImgListener)
     },
     updated() {
       // this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop
@@ -104,6 +110,8 @@
             this.currentType = SELL
             break
         }
+        this.$refs.tabControl1.currentIndex = index
+        this.$refs.tabControl2.currentIndex = index
       },
       contentScroll(position) {
 		    // 1.决定tabFixed是否显示
@@ -127,7 +135,7 @@
           this.recommends = res.data[RECOMMEND].list
           // 下次更新DOM时,获取新的tabOffsetTop值(不保险,可以在updated钩子中获取)
           this.$nextTick(() => {
-            this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop
+            this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
           })
         })
       },
