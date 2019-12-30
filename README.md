@@ -48,9 +48,9 @@ npm run lint
 ```javascript
 // 这段代码要放在其他js的前面
 (function(){
-    var redirect = sessionStorage.redirect;
+    const redirect = sessionStorage.redirect;
     delete sessionStorage.redirect;
-    if (redirect && redirect != location.href) {
+    if (redirect && redirect !== location.href) {
       history.replaceState(null, null, redirect);
     }
   })();
