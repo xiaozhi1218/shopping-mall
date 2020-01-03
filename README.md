@@ -25,7 +25,7 @@ npm run test
 npm run lint
 ```
 
-### Project deploy
+### Project deploy(Github Page)
 1. 先添加`404.html`页面
 ```html
 <!DOCTYPE html>
